@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jewelry Certificate Inquiry</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo-circle">
+                <div class="logo-icon">💎</div>
+                <div>DIAMOND<br>STATUS<br>2013</div>
+            </div>
+            <div class="title-section">
+                <h1>珠宝玉石质量监督检测中心</h1>
+                <h2>Jade jewelry quality supervision and Testing Center</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-bar">
+        <div class="nav-container">
+            <div class="nav-item">珠宝检测中心</div>
+            <div class="nav-item">新闻动态</div>
+            <div class="nav-item">关于我们</div>
+            <div class="nav-item">珠宝知识</div>
+            <div class="nav-item">检测仪器</div>
+            <div class="nav-item active">网上查询</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Search -->
+            <div class="sidebar-box">
+                <div class="box-header">证书查询</div>
+                <div class="box-content">
+                    <form class="search-form" onsubmit="event.preventDefault();">
+                        <input type="text" class="search-input" id="searchIdDisplay" placeholder="输入实验号"
+                            value="Z7281439">
+                        <button class="search-btn">🔍</button>
+                    </form>
+                    <div style="margin-top: 10px; text-align: center;">
+                        <button id="btnRandom"
+                            style="background: #28a745; color: white; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer; font-size: 12px;">🎲
+                            随机查询 (Random)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weather -->
+            <div class="sidebar-box">
+                <div class="box-header">本地天气信息</div>
+                <div class="box-content weather-info">
+                    <div style="margin-bottom: 10px;">
+                        <span>广州</span>
+                        <span class="icon-cloud">☁️</span>
+                    </div>
+                    <div>多云</div>
+                </div>
+            </div>
+
+            <!-- Working Hours -->
+            <div class="sidebar-box">
+                <div class="box-header">工作时间</div>
+                <div class="box-content work-hours">
+                    <div style="color: #007cc3; font-weight: bold; margin-bottom: 5px;">📅 营业时间</div>
+                    <div>周一至周五: 8:30-17:30</div>
+                    <div>周六至周日: 9:00-17:00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Content -->
+        <div class="content-area">
+            <div class="result-header">您的查询结果如下</div>
+
+            <div class="cert-id-display" id="mainCertId">Z7281439</div>
+
+            <div class="certificate">
+                <div class="cert-content">
+                    <!-- Left Column Specs -->
+                    <div class="cert-details">
+                        <div class="detail-row">
+                            <div class="detail-label">总质量</div>
+                            <div class="detail-value" id="displayMass">50g</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">密度</div>
+                            <div class="detail-value" id="displayDensity">3.33g/cm<sup>3</sup></div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">折射率</div>
+                            <div class="detail-value" id="displayRefraction">1.66 (点测)</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">光性特征</div>
+                            <div class="detail-value" id="displayOptical">非均质集合体</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">吸收光谱</div>
+                            <div class="detail-value" id="displaySpectrum">翡翠特征谱</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">放大检查</div>
+                            <div class="detail-value" id="displayMagnification">纤维柱粒交织结构</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">检验依据</div>
+                            <div class="detail-value" id="displayStandard">GB/T 16552 GB/T 16553</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">备注</div>
+                            <div class="detail-value" id="displayRemarks">*****</div>
+                        </div>
+
+                        <div class="慧莲">
+                            <div>主检:<span style="font-family: 'Cursive', serif; margin-left: 5px;">Signature1</span>
+                                (CGC, CPVG)</div>
+                        </div>
+                        <div class="福慧">
+                            <div>批准:<span style="font-family: 'Cursive', serif; margin-left: 5px;">Signature2</span>
+                                (CGC, CPVG)</div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column Image -->
+                    <div class="cert-image-section">
+                        <div class="cert-no-label" id="imgCaptionId">实验号: Z7281439</div>
+                        <div class="cert-result"><span>鉴定结果</span> <b style="font-size: 20px;" id="displayResult">翡翠</b>
+                        </div>
+
+                        <!-- Product Image -->
+                        <img src="bangle.png" alt="Jade Bangle" class="product-image">
+                    </div>
+                </div>
+
+                <!-- Footer elements -->
+                <div class="file-code">文件码: GKOIS</div>
+                <div class="qr-code">QR CODE</div>
+                <div class="website-link">证书查询: www.zbldzxzf.com</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Load data from localStorage based on URL param
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Get ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const queryId = urlParams.get('id');
+
+            // 2. Load List
+            let certList = [];
+            const savedList = localStorage.getItem('certList');
+            if (savedList) {
+                certList = JSON.parse(savedList);
+            } else {
+                // Check for old single data format for backward compatibility
+                const oldData = localStorage.getItem('certData');
+                if (oldData) certList.push(JSON.parse(oldData));
+            }
+
+            // 3. Find Item
+            let data = null;
+            if (queryId) {
+                // Find case-insensitive
+                data = certList.find(item => item.certId.toLowerCase() === queryId.toLowerCase());
+            }
+
+            // Fallback: if no ID or not found, try to show the first one or default
+            if (!data && certList.length > 0) {
+                if (queryId) alert('Certificate not found: ' + queryId);
+                // Optional: default to first item? Or stay blank? 
+                // Let's default to first item to show *something* if list exists
+                data = certList[0];
+            }
+
+            // 4. Render Data
+            if (data) {
+                if (data.certId) {
+                    document.getElementById('searchIdDisplay').value = data.certId;
+                    document.getElementById('mainCertId').innerText = data.certId;
+                    document.getElementById('imgCaptionId').innerText = '实验号: ' + data.certId;
+                }
+
+                if (data.mass) document.getElementById('displayMass').innerText = data.mass;
+                if (data.density) document.getElementById('displayDensity').innerText = data.density;
+                if (data.refraction) document.getElementById('displayRefraction').innerText = data.refraction;
+                if (data.optical) document.getElementById('displayOptical').innerText = data.optical;
+                if (data.spectrum) document.getElementById('displaySpectrum').innerText = data.spectrum;
+                if (data.magnification) document.getElementById('displayMagnification').innerHTML = data.magnification; // innerHTML in case of <br>
+                if (data.standard) document.getElementById('displayStandard').innerText = data.standard;
+                if (data.remarks) document.getElementById('displayRemarks').innerText = data.remarks;
+                if (data.result) document.getElementById('displayResult').innerText = data.result;
+
+                // Image
+                const imgEl = document.querySelector('.product-image');
+                if (data.imageUrl && data.imageUrl.trim() !== '') {
+                    imgEl.src = data.imageUrl;
+                } else {
+                    imgEl.src = 'bangle.png';
+                }
+
+                // QR Code
+                // URL of *this* page
+                const currentUrl = window.location.href.split('?')[0] + '?id=' + encodeURIComponent(data.certId);
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(currentUrl)}`;
+
+                // Update QR container
+                const qrContainer = document.querySelector('.qr-code');
+                qrContainer.innerHTML = ''; // clear text 'QR CODE'
+                qrContainer.style.backgroundImage = `url('${qrUrl}')`;
+                qrContainer.style.backgroundSize = 'contain';
+                qrContainer.style.backgroundRepeat = 'no-repeat';
+                qrContainer.style.border = 'none';
+            }
+        });
+
+
+
+        // Search Form Handler
+        document.querySelector('.search-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const val = document.getElementById('searchIdDisplay').value;
+            if (val) {
+                window.location.search = '?id=' + encodeURIComponent(val);
+            }
+        });
+
+        // Random Button Handler
+        document.getElementById('btnRandom').addEventListener('click', () => {
+            const savedList = localStorage.getItem('certList');
+            if (savedList) {
+                const list = JSON.parse(savedList);
+                if (list.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * list.length);
+                    const randomId = list[randomIndex].certId;
+                    window.location.search = '?id=' + encodeURIComponent(randomId);
+                } else {
+                    alert('No data found!');
+                }
+            } else {
+                // Fallback if no list
+                window.location.search = '?id=Z7281439';
+            }
+        });
+    </script>
+</body>
+
+</html>
