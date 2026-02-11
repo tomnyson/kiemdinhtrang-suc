@@ -7,6 +7,7 @@
     <title>Certificate Management - Admin</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -232,6 +233,17 @@
         .btn-edit {
             background-color: #ffc107;
             color: #212529;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .btn-qr {
+            background-color: #17a2b8;
+            color: #fff;
             border: none;
             padding: 5px 10px;
             border-radius: 4px;
@@ -471,6 +483,7 @@
 
     <script>
         let supabaseClient = null;
+        let appConfig = null;
         let currentUser = null;
         let accessToken = null;
         let certList = [];
@@ -485,12 +498,32 @@
             try {
                 const res = await fetch('/config');
                 if (!res.ok) throw new Error('Failed to load config');
-                const config = await res.json();
-                supabaseClient = supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+                appConfig = await res.json();
+                supabaseClient = supabase.createClient(appConfig.supabaseUrl, appConfig.supabaseAnonKey);
             } catch (err) {
                 console.error('Init error:', err);
                 showLoginError('Failed to initialize. Please try again later.');
             }
+        }
+
+        function getPublicBaseUrl() {
+            const configured = String(appConfig?.publicBaseUrl || '').trim().replace(/\/+$/, '');
+            return configured || window.location.origin;
+        }
+
+        function getCertificateUrl(certId) {
+            return `${getPublicBaseUrl()}/index.html?id=${encodeURIComponent(certId)}`;
+        }
+
+        async function generateQrDataUrl(content, size = 180) {
+            if (!window.QRCode?.toDataURL) {
+                return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(content)}`;
+            }
+            return QRCode.toDataURL(content, {
+                width: size,
+                margin: 1,
+                errorCorrectionLevel: 'M'
+            });
         }
 
         async function checkAuth() {
@@ -614,7 +647,7 @@
                     imageUrl: p.image_url,
                     ...JSON.parse(p.description || '{}')
                 }));
-                renderTable();
+                await renderTable();
             } catch (err) {
                 console.error('Load error:', err);
                 document.getElementById('tableBody').innerHTML = '<tr><td colspan="7">Failed to load data</td></tr>';
@@ -622,49 +655,74 @@
         }
 
         // RENDER
-        function renderTable(filterText = '') {
+        async function renderTable(filterText = '') {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
+            let renderedRows = 0;
 
             if (certList.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #666;">No certificates found. Click "+ Add New" to create one.</td></tr>';
                 return;
             }
 
-            certList.forEach((item, index) => {
-                if (filterText && !item.certId.toLowerCase().includes(filterText.toLowerCase())) return;
+            for (let index = 0; index < certList.length; index += 1) {
+                const item = certList[index];
+                if (filterText && !item.certId.toLowerCase().includes(filterText.toLowerCase())) continue;
 
                 const tr = document.createElement('tr');
 
-                // Get absolute URL for QR
-                const link = `index.html?id=${encodeURIComponent(item.certId)}`;
-                const absoluteLink = window.location.href.replace('admin.html', link);
-                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(absoluteLink)}`;
+                // Build QR from configured public domain (or current origin fallback).
+                const certificateUrl = getCertificateUrl(item.certId);
+                const qrUrl = await generateQrDataUrl(certificateUrl, 150);
 
                 // Image src logic
                 const imgDisplay = (item.imageUrl && item.imageUrl.trim() !== '') ? item.imageUrl : 'bangle.png';
 
                 tr.innerHTML = `
-                    <td><a href="${link}" target="_blank">View Page</a></td>
+                    <td><a href="${certificateUrl}" target="_blank" rel="noopener noreferrer">View Page</a></td>
                     <td><strong>${item.certId}</strong></td>
                     <td><img src="${imgDisplay}" class="qr-thumb" style="object-fit: cover; border: 1px solid #ddd;" onerror="this.src='bangle.png'" /></td>
                     <td>${item.result || '-'}</td>
                     <td>${item.mass || '-'}</td>
-                    <td><img src="${qrUrl}" class="qr-thumb" title="Link to ${item.certId}"/></td>
+                    <td><img src="${qrUrl}" class="qr-thumb" title="Link to ${item.certId}" /></td>
                     <td>
                         <button class="btn-edit" onclick="editItem(${index})">Edit</button>
+                        <button class="btn-qr" onclick="downloadQr(${index})">Download QR</button>
                         <button class="btn-danger" onclick="deleteItem(${index})">Delete</button>
                     </td>
                 `;
 
                 tbody.appendChild(tr);
-            });
+                renderedRows += 1;
+            }
+
+            if (renderedRows === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #666;">No matching certificates.</td></tr>';
+            }
         }
 
         // ACTIONS
         function filterList() {
             const text = document.getElementById('searchInput').value;
             renderTable(text);
+        }
+
+        async function downloadQr(index) {
+            const item = certList[index];
+            if (!item?.certId) return;
+            try {
+                const certificateUrl = getCertificateUrl(item.certId);
+                const qrUrl = await generateQrDataUrl(certificateUrl, 512);
+                const safeId = String(item.certId).replace(/[^a-zA-Z0-9._-]/g, '_');
+                const anchor = document.createElement('a');
+                anchor.href = qrUrl;
+                anchor.download = `certificate-qr-${safeId}.png`;
+                document.body.appendChild(anchor);
+                anchor.click();
+                anchor.remove();
+            } catch (err) {
+                alert('Failed to generate QR: ' + err.message);
+            }
         }
 
         async function deleteItem(index) {
@@ -674,7 +732,7 @@
             try {
                 await apiRequest(`/products/${item.id}`, { method: 'DELETE' });
                 certList.splice(index, 1);
-                renderTable();
+                await renderTable();
             } catch (err) {
                 alert('Failed to delete: ' + err.message);
             }

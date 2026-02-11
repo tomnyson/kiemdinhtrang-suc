@@ -14,9 +14,9 @@ const {
   SUPABASE_SERVICE_ROLE_KEY,
   SUPABASE_BUCKET = 'product-images',
   SIGNED_URL_EXPIRES_IN = 31536000,
-  ADMIN_EMAILS = ''
+  ADMIN_EMAILS = '',
+  PUBLIC_BASE_URL = ''
 } = process.env;
-console.log(process.env)
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in environment.');
@@ -45,6 +45,7 @@ const upload = multer({
 });
 
 const sanitizeFilename = (name) => name.replace(/[^a-zA-Z0-9._-]/g, '_');
+const normalizeBaseUrl = (url) => String(url || '').trim().replace(/\/+$/, '');
 const adminEmailSet = new Set(
   String(ADMIN_EMAILS)
     .split(',')
@@ -167,7 +168,8 @@ app.get('/config', (req, res) => {
   }
   return res.json({
     supabaseUrl: SUPABASE_URL,
-    supabaseAnonKey: SUPABASE_ANON_KEY
+    supabaseAnonKey: SUPABASE_ANON_KEY,
+    publicBaseUrl: normalizeBaseUrl(PUBLIC_BASE_URL)
   });
 });
 
