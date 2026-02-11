@@ -6,9 +6,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Certificate Management - Admin</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body.admin-body {
             background-color: #f4f6f9;
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Site Header */
+        .site-header {
+            background: linear-gradient(135deg, #005bac 0%, #003d7a 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .site-header .logo {
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .site-header .logo img {
+            height: 40px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info .user-email {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .btn-logout {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-logout:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Site Footer */
+        .site-footer {
+            background: #333;
+            color: #aaa;
+            text-align: center;
+            padding: 20px;
+            margin-top: auto;
+            font-size: 13px;
+        }
+
+        .site-footer a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
             padding: 20px;
         }
 
@@ -19,6 +98,82 @@
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Login Container */
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .login-container h2 {
+            text-align: center;
+            color: #005bac;
+            margin-bottom: 30px;
+        }
+
+        .login-container .form-group {
+            margin-bottom: 20px;
+        }
+
+        .login-container .btn-primary {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+        }
+
+        .login-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .btn-google {
+            width: 100%;
+            padding: 12px;
+            font-size: 15px;
+            background-color: white;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-google:hover {
+            background-color: #f8f9fa;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 25px 0;
+            color: #999;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .divider span {
+            padding: 0 15px;
+            font-size: 13px;
         }
 
         .admin-header {
@@ -52,6 +207,16 @@
             padding: 10px 20px;
             border-radius: 4px;
             cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #004a8c;
+        }
+
+        .btn-primary:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
 
         .btn-danger {
@@ -129,18 +294,70 @@
             width: 50px;
             height: 50px;
         }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 
 <body class="admin-body">
+    <!-- Site Header -->
+    <header class="site-header" id="siteHeader" style="display: none;">
+        <div class="logo">
+            <span>🔬 Certificate Admin</span>
+        </div>
+        <div class="user-info">
+            <span class="user-email" id="userEmail"></span>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </header>
 
-    <div class="admin-container">
+    <div class="main-content">
+        <!-- Login View -->
+        <div id="loginView" class="login-container">
+            <h2>🔐 Admin Login</h2>
+            <div class="login-error" id="loginError"></div>
+            
+            <button type="button" class="btn-google" onclick="loginWithGoogle()">
+                <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                    <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                    <path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/>
+                    <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+                </svg>
+                Login with Google
+            </button>
+            
+            <div class="divider"><span>or</span></div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" class="form-control" required placeholder="admin@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" class="form-control" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn-primary" id="loginBtn">Login</button>
+            </form>
+        </div>
+
+        <!-- Admin Container (shown after login) -->
+        <div class="admin-container" id="adminContainer" style="display: none;">
 
         <!-- List View -->
         <div id="listView">
             <div class="admin-header">
                 <h2>Product List</h2>
-                <button class="btn-primary" onclick="showForm()">+ Add New</button>
+                <button class="btn-primary" onclick="showForm(true)">+ Add New</button>
             </div>
 
             <div class="controls-area">
@@ -174,6 +391,7 @@
 
             <form id="certForm">
                 <input type="hidden" id="editIndex" value="-1">
+                <input type="hidden" id="editId" value="">
 
                 <div class="form-group">
                     <label>Certificate ID (实验号)</label>
@@ -226,64 +444,192 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Image (Optional URL or leave for default)</label>
-                    <input type="text" id="imageUrl" class="form-control" placeholder="Leave empty for default bangle">
+                    <label>Upload Image (Optional)</label>
+                    <input type="file" id="imageFile" class="form-control" accept="image/*" onchange="previewImage(this)">
+                    <input type="hidden" id="existingImageUrl" value="">
+                    <div id="imagePreview" style="margin-top: 10px; display: none;">
+                        <img id="previewImg" src="" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; border-radius: 4px;">
+                        <button type="button" class="btn-danger" style="margin-left: 10px; vertical-align: top;" onclick="clearImagePreview()">Remove</button>
+                    </div>
                 </div>
 
                 <div style="margin-top: 20px;">
                     <button type="button" class="btn-cancel" onclick="showList()">Cancel</button>
-                    <button type="submit" class="btn-primary">Save Certificate</button>
+                    <button type="submit" class="btn-primary" id="saveBtn">Save Certificate</button>
                 </div>
             </form>
         </div>
 
+        </div>
     </div>
 
+    <!-- Site Footer -->
+    <footer class="site-footer">
+        <p>&copy; 2026 Certificate Verification System. All rights reserved.</p>
+        <p>Contact: <a href="mailto:support@example.com">support@example.com</a></p>
+    </footer>
+
     <script>
+        let supabaseClient = null;
+        let currentUser = null;
+        let accessToken = null;
         let certList = [];
 
         // INIT
-        document.addEventListener('DOMContentLoaded', () => {
-            loadData();
-            renderTable();
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initSupabase();
+            await checkAuth();
         });
 
-        function loadData() {
-            const stored = localStorage.getItem('certList');
-            if (stored) {
-                certList = JSON.parse(stored);
-            } else {
-                // Initialize with the default one if list is empty
-                const oldSingle = localStorage.getItem('certData');
-                if (oldSingle) {
-                    certList.push(JSON.parse(oldSingle));
-                } else {
-                    // Seed data
-                    certList.push({
-                        certId: 'Z7281439',
-                        mass: '50g',
-                        density: '3.33g/cm³',
-                        refraction: '1.66 (点测)',
-                        optical: '非均质集合体',
-                        spectrum: '翡翠特征谱',
-                        magnification: '纤维柱粒交织结构',
-                        standard: 'GB/T 16552 GB/T 16553',
-                        remarks: '*****',
-                        result: '翡翠'
-                    });
-                }
-                saveData();
+        async function initSupabase() {
+            try {
+                const res = await fetch('/config');
+                if (!res.ok) throw new Error('Failed to load config');
+                const config = await res.json();
+                supabaseClient = supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+            } catch (err) {
+                console.error('Init error:', err);
+                showLoginError('Failed to initialize. Please try again later.');
             }
         }
 
-        function saveData() {
-            localStorage.setItem('certList', JSON.stringify(certList));
+        async function checkAuth() {
+            if (!supabaseClient) return;
+
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                accessToken = session.access_token;
+                showAdminPanel();
+                await loadData();
+            } else {
+                showLoginForm();
+            }
+
+            // Listen for auth changes
+            supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                if (session) {
+                    currentUser = session.user;
+                    accessToken = session.access_token;
+                    showAdminPanel();
+                    await loadData();
+                } else {
+                    currentUser = null;
+                    accessToken = null;
+                    showLoginForm();
+                }
+            });
+        }
+
+        function showLoginForm() {
+            document.getElementById('siteHeader').style.display = 'none';
+            document.getElementById('loginView').style.display = 'block';
+            document.getElementById('adminContainer').style.display = 'none';
+        }
+
+        function showAdminPanel() {
+            document.getElementById('siteHeader').style.display = 'flex';
+            document.getElementById('loginView').style.display = 'none';
+            document.getElementById('adminContainer').style.display = 'block';
+            document.getElementById('userEmail').textContent = currentUser?.email || 'User';
+        }
+
+        function showLoginError(msg) {
+            const errorEl = document.getElementById('loginError');
+            errorEl.textContent = msg;
+            errorEl.style.display = 'block';
+        }
+
+        // LOGIN WITH GOOGLE
+        async function loginWithGoogle() {
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: window.location.origin + '/admin.html'
+                    }
+                });
+                if (error) throw error;
+            } catch (err) {
+                showLoginError(err.message || 'Google login failed');
+            }
+        }
+
+        // LOGIN
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const btn = document.getElementById('loginBtn');
+
+            btn.disabled = true;
+            btn.textContent = 'Logging in...';
+            document.getElementById('loginError').style.display = 'none';
+
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+            } catch (err) {
+                showLoginError(err.message || 'Login failed');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Login';
+            }
+        });
+
+        // LOGOUT
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            certList = [];
+            showLoginForm();
+        }
+
+        // API HELPERS
+        async function apiRequest(url, options = {}) {
+            const headers = {
+                'Authorization': `Bearer ${accessToken}`,
+                ...options.headers
+            };
+            const res = await fetch(url, { ...options, headers });
+            if (!res.ok) {
+                if (res.status === 403) {
+                    await supabaseClient.auth.signOut();
+                    showLoginForm();
+                    showLoginError('Admin access required.');
+                }
+                const err = await res.json().catch(() => ({ error: res.statusText }));
+                throw new Error(err.error || 'Request failed');
+            }
+            return res.json();
+        }
+
+        // LOAD DATA FROM SUPABASE
+        async function loadData() {
+            try {
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="7" class="loading">Loading...</td></tr>';
+                const data = await apiRequest('/products');
+                certList = data.map(p => ({
+                    id: p.id,
+                    certId: p.name,
+                    imageUrl: p.image_url,
+                    ...JSON.parse(p.description || '{}')
+                }));
+                renderTable();
+            } catch (err) {
+                console.error('Load error:', err);
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="7">Failed to load data</td></tr>';
+            }
         }
 
         // RENDER
         function renderTable(filterText = '') {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
+
+            if (certList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #666;">No certificates found. Click "+ Add New" to create one.</td></tr>';
+                return;
+            }
 
             certList.forEach((item, index) => {
                 if (filterText && !item.certId.toLowerCase().includes(filterText.toLowerCase())) return;
@@ -301,9 +647,9 @@
                 tr.innerHTML = `
                     <td><a href="${link}" target="_blank">View Page</a></td>
                     <td><strong>${item.certId}</strong></td>
-                    <td><img src="${imgDisplay}" class="qr-thumb" style="object-fit: cover; border: 1px solid #ddd;" /></td>
-                    <td>${item.result}</td>
-                    <td>${item.mass}</td>
+                    <td><img src="${imgDisplay}" class="qr-thumb" style="object-fit: cover; border: 1px solid #ddd;" onerror="this.src='bangle.png'" /></td>
+                    <td>${item.result || '-'}</td>
+                    <td>${item.mass || '-'}</td>
                     <td><img src="${qrUrl}" class="qr-thumb" title="Link to ${item.certId}"/></td>
                     <td>
                         <button class="btn-edit" onclick="editItem(${index})">Edit</button>
@@ -321,49 +667,89 @@
             renderTable(text);
         }
 
-        function deleteItem(index) {
-            if (confirm('Are you sure you want to delete this certificate?')) {
+        async function deleteItem(index) {
+            if (!confirm('Are you sure you want to delete this certificate?')) return;
+
+            const item = certList[index];
+            try {
+                await apiRequest(`/products/${item.id}`, { method: 'DELETE' });
                 certList.splice(index, 1);
-                saveData();
                 renderTable();
+            } catch (err) {
+                alert('Failed to delete: ' + err.message);
             }
         }
 
         function editItem(index) {
             const item = certList[index];
             document.getElementById('editIndex').value = index;
+            document.getElementById('editId').value = item.id || '';
             document.getElementById('formTitle').innerText = 'Edit Certificate';
 
             // Populate form
             document.getElementById('certId').value = item.certId || '';
-            document.getElementById('mass').value = item.mass || '';
-            document.getElementById('density').value = item.density || '';
-            document.getElementById('refraction').value = item.refraction || '';
-            document.getElementById('optical').value = item.optical || '';
-            document.getElementById('spectrum').value = item.spectrum || '';
-            document.getElementById('magnification').value = item.magnification || '';
-            document.getElementById('standard').value = item.standard || '';
-            document.getElementById('remarks').value = item.remarks || '';
-            document.getElementById('result').value = item.result || '';
-            document.getElementById('imageUrl').value = item.imageUrl || '';
+            document.getElementById('mass').value = item.mass || '50g';
+            document.getElementById('density').value = item.density || '3.33g/cm³';
+            document.getElementById('refraction').value = item.refraction || '1.66 (点测)';
+            document.getElementById('optical').value = item.optical || '非均质集合体';
+            document.getElementById('spectrum').value = item.spectrum || '翡翠特征谱';
+            document.getElementById('magnification').value = item.magnification || '纤维柱粒交织结构';
+            document.getElementById('standard').value = item.standard || 'GB/T 16552 GB/T 16553';
+            document.getElementById('remarks').value = item.remarks || '*****';
+            document.getElementById('result').value = item.result || '翡翠';
+            document.getElementById('existingImageUrl').value = item.imageUrl || '';
+            
+            // Show existing image preview
+            if (item.imageUrl) {
+                document.getElementById('previewImg').src = item.imageUrl;
+                document.getElementById('imagePreview').style.display = 'block';
+            } else {
+                clearImagePreview();
+            }
 
             showForm();
         }
 
-        function showForm() {
+        function showForm(isNew = false) {
             document.getElementById('listView').style.display = 'none';
             document.getElementById('formView').style.display = 'block';
 
-            // If adding new (editIndex is -1 reset by logic usually, but here reliant on caller)
-            // Actually let's just create a helper for 'Add New'
-            if (document.activeElement.innerText === '+ Add New') {
+            if (isNew) {
                 document.getElementById('editIndex').value = '-1';
+                document.getElementById('editId').value = '';
                 document.getElementById('formTitle').innerText = 'New Certificate';
                 document.getElementById('certForm').reset();
-                // Set Defaults again because reset clears them
+                // Set Defaults
                 document.getElementById('mass').value = '50g';
-                // ... other defaults if needed, or just let them type
+                document.getElementById('density').value = '3.33g/cm³';
+                document.getElementById('refraction').value = '1.66 (点测)';
+                document.getElementById('optical').value = '非均质集合体';
+                document.getElementById('spectrum').value = '翡翠特征谱';
+                document.getElementById('magnification').value = '纤维柱粒交织结构';
+                document.getElementById('standard').value = 'GB/T 16552 GB/T 16553';
+                document.getElementById('remarks').value = '*****';
+                document.getElementById('result').value = '翡翠';
+                clearImagePreview();
             }
+        }
+
+        // IMAGE PREVIEW FUNCTIONS
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function clearImagePreview() {
+            document.getElementById('imageFile').value = '';
+            document.getElementById('existingImageUrl').value = '';
+            document.getElementById('previewImg').src = '';
+            document.getElementById('imagePreview').style.display = 'none';
         }
 
         function showList() {
@@ -372,12 +758,16 @@
         }
 
         // SAVE
-        document.getElementById('certForm').addEventListener('submit', (e) => {
+        document.getElementById('certForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
 
             const idx = parseInt(document.getElementById('editIndex').value);
-            const newItem = {
-                certId: document.getElementById('certId').value,
+            const editId = document.getElementById('editId').value;
+
+            const certData = {
                 mass: document.getElementById('mass').value,
                 density: document.getElementById('density').value,
                 refraction: document.getElementById('refraction').value,
@@ -386,21 +776,43 @@
                 magnification: document.getElementById('magnification').value,
                 standard: document.getElementById('standard').value,
                 remarks: document.getElementById('remarks').value,
-                result: document.getElementById('result').value,
-                imageUrl: document.getElementById('imageUrl').value
+                result: document.getElementById('result').value
             };
 
-            if (idx >= 0) {
-                // Update
-                certList[idx] = newItem;
-            } else {
-                // Add
-                certList.push(newItem);
+            const formData = new FormData();
+            formData.append('name', document.getElementById('certId').value);
+            formData.append('description', JSON.stringify(certData));
+            formData.append('price', '0');
+
+            // Add image file if selected
+            const imageFile = document.getElementById('imageFile').files[0];
+            if (imageFile) {
+                formData.append('image', imageFile);
             }
 
-            saveData();
-            renderTable();
-            showList();
+            try {
+                if (editId) {
+                    // Update existing
+                    await apiRequest(`/products/${editId}`, {
+                        method: 'PUT',
+                        body: formData
+                    });
+                } else {
+                    // Create new
+                    await apiRequest('/products', {
+                        method: 'POST',
+                        body: formData
+                    });
+                }
+
+                await loadData();
+                showList();
+            } catch (err) {
+                alert('Failed to save: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save Certificate';
+            }
         });
 
     </script>

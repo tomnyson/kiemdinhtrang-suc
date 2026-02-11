@@ -5,34 +5,365 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jewelry Certificate Inquiry</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --nav-blue: #0e4c7c;
+            --nav-blue-dark: #0a3b63;
+            --panel-blue: #bfe6f7;
+            --panel-border: #9cc8dc;
+            --ink: #1f2f3d;
+            --muted: #4a5b6a;
+            --bg: #e9edf2;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            background: var(--bg) url("bg_pattern.png");
+            color: var(--ink);
+        }
+
+        .nav-bar {
+            background: linear-gradient(180deg, var(--nav-blue), var(--nav-blue-dark));
+            border-bottom: 1px solid #08324e;
+        }
+
+        .nav-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+        }
+
+        .nav-wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 8px;
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 12px 6px;
+            color: #e8f1f7;
+            font-size: 14px;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-item:last-child {
+            border-right: none;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(180deg, #1b6aa1, #0f4c7a);
+            font-weight: 700;
+        }
+
+        .lang-toggle {
+            display: flex;
+            gap: 6px;
+            padding: 6px 0;
+        }
+
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: #e8f1f7;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 4px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .lang-btn.active {
+            background: #e8f1f7;
+            color: #0f4c7a;
+            border-color: #e8f1f7;
+            font-weight: 700;
+        }
+
+        .main-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 18px;
+            padding: 16px 16px 40px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .sidebar-box {
+            background: #f7f9fb;
+            border: 1px solid #cfd6de;
+            box-shadow: inset 0 1px 0 #fff;
+        }
+
+        .box-header {
+            padding: 8px 10px;
+            background: linear-gradient(180deg, #1c5c8a, #15496f);
+            color: #eaf5ff;
+            font-size: 14px;
+            font-weight: 700;
+            border-bottom: 1px solid #0c3855;
+        }
+
+        .box-content {
+            padding: 10px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: 1fr 40px;
+            gap: 6px;
+        }
+
+        .search-input {
+            padding: 6px 8px;
+            border: 1px solid #9fb3c7;
+            background: #fff;
+            font-size: 13px;
+        }
+
+        .search-btn {
+            background: #2f7fbd;
+            color: #fff;
+            border: 1px solid #1e5d8d;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .random-btn {
+            background: #e1f0fb;
+            color: #1f5e8d;
+            border: 1px solid #9fbfda;
+            padding: 4px 10px;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .weather-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .weather-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .icon-cloud {
+            font-size: 18px;
+        }
+
+        .work-hours {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .news-item {
+            padding: 6px 0;
+            border-bottom: 1px dashed #c7d1db;
+        }
+
+        .news-item:last-child {
+            border-bottom: none;
+        }
+
+        .content-area {
+            background: rgba(255, 255, 255, 0.75);
+            border: 1px solid #cbd3db;
+            padding: 12px 20px 28px;
+            min-height: 640px;
+        }
+
+        .result-header {
+            color: #205f8e;
+            font-weight: 700;
+            margin: 4px 0 12px;
+        }
+
+        .cert-id-display {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #2b2f33;
+            letter-spacing: 1px;
+        }
+
+        .certificate {
+            position: relative;
+            margin: 0 auto;
+            max-width: 760px;
+            background: #e9f6ff;
+            border: 2px solid #a2d0e6;
+            border-radius: 10px;
+            padding: 14px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+        }
+
+        .cert-content {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 12px;
+        }
+
+        .cert-details {
+            background: var(--panel-blue);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 12px;
+        }
+
+        .detail-row {
+            display: grid;
+            grid-template-columns: 90px 1fr;
+            padding: 4px 0;
+            border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #1f4e6f;
+        }
+
+        .detail-value {
+            color: #22313f;
+            font-weight: 600;
+        }
+
+        .慧莲,
+        .福慧 {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #234255;
+        }
+
+        .cert-image-section {
+            background: #fff;
+            border: 1px solid #c9d5e0;
+            border-radius: 8px;
+            padding: 10px;
+            min-height: 320px;
+            position: relative;
+        }
+
+        .cert-no-label {
+            font-size: 12px;
+            color: #345;
+        }
+
+        .cert-result {
+            margin: 6px 0 8px;
+            font-size: 14px;
+            border-bottom: 1px solid #cfd8e3;
+            padding-bottom: 6px;
+        }
+
+        .product-image {
+            width: 100%;
+            max-width: 260px;
+            display: block;
+            margin: 10px auto 0;
+            border: 1px solid #ddd;
+            background: #f4f4f4;
+        }
+
+        .file-code {
+            position: absolute;
+            right: 102px;
+            bottom: 16px;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .qr-code {
+            position: absolute;
+            right: 20px;
+            bottom: 14px;
+            width: 70px;
+            height: 70px;
+            border: 1px solid #999;
+            background: #f3f3f3;
+        }
+
+        .website-link {
+            position: absolute;
+            left: 20px;
+            bottom: 16px;
+            font-size: 12px;
+            color: #2f5572;
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-container {
+                flex-wrap: wrap;
+            }
+
+            .nav-item {
+                flex: 1 0 33%;
+            }
+
+            .content-area {
+                min-height: auto;
+            }
+
+            .cert-content {
+                grid-template-columns: 1fr;
+            }
+
+            .file-code,
+            .qr-code,
+            .website-link {
+                position: static;
+                margin-top: 8px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <!-- Header -->
-    <div class="header">
-        <div class="header-content">
-            <div class="logo-circle">
-                <div class="logo-icon">💎</div>
-                <div>DIAMOND<br>STATUS<br>2013</div>
-            </div>
-            <div class="title-section">
-                <h1>珠宝玉石质量监督检测中心</h1>
-                <h2>Jade jewelry quality supervision and Testing Center</h2>
-            </div>
-        </div>
-    </div>
-
     <!-- Navigation -->
     <div class="nav-bar">
-        <div class="nav-container">
-            <div class="nav-item">珠宝检测中心</div>
-            <div class="nav-item">新闻动态</div>
-            <div class="nav-item">关于我们</div>
-            <div class="nav-item">珠宝知识</div>
-            <div class="nav-item">检测仪器</div>
-            <div class="nav-item active">网上查询</div>
+        <div class="nav-wrap">
+            <div class="nav-container">
+                <div class="nav-item" data-i18n="nav_center">珠宝检测中心</div>
+                <div class="nav-item" data-i18n="nav_news">新闻动态</div>
+                <div class="nav-item" data-i18n="nav_about">关于我们</div>
+                <div class="nav-item" data-i18n="nav_knowledge">珠宝知识</div>
+                <div class="nav-item" data-i18n="nav_equipment">检测仪器</div>
+                <div class="nav-item active" data-i18n="nav_query">网上查询</div>
+            </div>
+            <div class="lang-toggle" aria-label="Language">
+                <button class="lang-btn" type="button" data-lang="zh">中文</button>
+                <button class="lang-btn" type="button" data-lang="en">English</button>
+            </div>
         </div>
     </div>
 
@@ -43,47 +374,58 @@
         <div class="sidebar">
             <!-- Search -->
             <div class="sidebar-box">
-                <div class="box-header">证书查询</div>
+                <div class="box-header" data-i18n="sidebar_search">证书查询</div>
                 <div class="box-content">
                     <form class="search-form" onsubmit="event.preventDefault();">
                         <input type="text" class="search-input" id="searchIdDisplay" placeholder="输入实验号"
+                            data-i18n-placeholder="placeholder_experiment"
                             value="Z7281439">
                         <button class="search-btn">🔍</button>
                     </form>
                     <div style="margin-top: 10px; text-align: center;">
                         <button id="btnRandom"
-                            style="background: #28a745; color: white; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer; font-size: 12px;">🎲
-                            随机查询 (Random)</button>
+                            class="random-btn" data-i18n="btn_random">随机查询</button>
                     </div>
                 </div>
             </div>
 
             <!-- Weather -->
             <div class="sidebar-box">
-                <div class="box-header">本地天气信息</div>
+                <div class="box-header" data-i18n="sidebar_weather">本地天气信息</div>
                 <div class="box-content weather-info">
-                    <div style="margin-bottom: 10px;">
-                        <span>广州</span>
+                    <div class="weather-row">
+                        <span data-i18n="weather_city">广州</span>
                         <span class="icon-cloud">☁️</span>
                     </div>
-                    <div>多云</div>
+                    <div data-i18n="weather_condition">多云</div>
                 </div>
             </div>
 
             <!-- Working Hours -->
             <div class="sidebar-box">
-                <div class="box-header">工作时间</div>
+                <div class="box-header" data-i18n="sidebar_hours">工作时间</div>
                 <div class="box-content work-hours">
-                    <div style="color: #007cc3; font-weight: bold; margin-bottom: 5px;">📅 营业时间</div>
-                    <div>周一至周五: 8:30-17:30</div>
-                    <div>周六至周日: 9:00-17:00</div>
+                    <div style="color: #2a5c86; font-weight: bold;" data-i18n="hours_title">营业时间</div>
+                    <div data-i18n="hours_weekdays">周一至周五: 8:30-17:30</div>
+                    <div data-i18n="hours_weekends">周六至周日: 9:00-17:00</div>
+                </div>
+            </div>
+
+            <!-- News -->
+            <div class="sidebar-box">
+                <div class="box-header" data-i18n="sidebar_news">新闻动态</div>
+                <div class="box-content">
+                    <div class="news-item" data-i18n="news_1">检测通知公告</div>
+                    <div class="news-item" data-i18n="news_2">证书查询系统升级</div>
+                    <div class="news-item" data-i18n="news_3">样品接收提醒</div>
+                    <div style="text-align: right; color: #2f6a9b; font-size: 12px;" data-i18n="news_more">更多 &gt;&gt;</div>
                 </div>
             </div>
         </div>
 
         <!-- Right Content -->
         <div class="content-area">
-            <div class="result-header">您的查询结果如下</div>
+            <div class="result-header" data-i18n="result_header">您的查询结果如下</div>
 
             <div class="cert-id-display" id="mainCertId">Z7281439</div>
 
@@ -92,44 +434,44 @@
                     <!-- Left Column Specs -->
                     <div class="cert-details">
                         <div class="detail-row">
-                            <div class="detail-label">总质量</div>
+                            <div class="detail-label" data-i18n="label_mass">总质量</div>
                             <div class="detail-value" id="displayMass">50g</div>
                         </div>
                         <div class="detail-row">
-                            <div class="detail-label">密度</div>
+                            <div class="detail-label" data-i18n="label_density">密度</div>
                             <div class="detail-value" id="displayDensity">3.33g/cm<sup>3</sup></div>
                         </div>
                         <div class="detail-row">
-                            <div class="detail-label">折射率</div>
+                            <div class="detail-label" data-i18n="label_refraction">折射率</div>
                             <div class="detail-value" id="displayRefraction">1.66 (点测)</div>
                         </div>
                         <div class="detail-row">
-                            <div class="detail-label">光性特征</div>
+                            <div class="detail-label" data-i18n="label_optical">光性特征</div>
                             <div class="detail-value" id="displayOptical">非均质集合体</div>
                         </div>
                         <div class="detail-row">
-                            <div class="detail-label">吸收光谱</div>
+                            <div class="detail-label" data-i18n="label_spectrum">吸收光谱</div>
                             <div class="detail-value" id="displaySpectrum">翡翠特征谱</div>
                         </div>
                         <div class="detail-row">
-                            <div class="detail-label">放大检查</div>
+                            <div class="detail-label" data-i18n="label_magnification">放大检查</div>
                             <div class="detail-value" id="displayMagnification">纤维柱粒交织结构</div>
                         </div>
                         <div class="detail-row">
-                            <div class="detail-label">检验依据</div>
+                            <div class="detail-label" data-i18n="label_standard">检验依据</div>
                             <div class="detail-value" id="displayStandard">GB/T 16552 GB/T 16553</div>
                         </div>
                         <div class="detail-row">
-                            <div class="detail-label">备注</div>
+                            <div class="detail-label" data-i18n="label_remarks">备注</div>
                             <div class="detail-value" id="displayRemarks">*****</div>
                         </div>
 
                         <div class="慧莲">
-                            <div>主检:<span style="font-family: 'Cursive', serif; margin-left: 5px;">Signature1</span>
+                            <div><span data-i18n="label_inspector">主检</span>:<span style="font-family: 'Cursive', serif; margin-left: 5px;">Signature1</span>
                                 (CGC, CPVG)</div>
                         </div>
                         <div class="福慧">
-                            <div>批准:<span style="font-family: 'Cursive', serif; margin-left: 5px;">Signature2</span>
+                            <div><span data-i18n="label_approver">批准</span>:<span style="font-family: 'Cursive', serif; margin-left: 5px;">Signature2</span>
                                 (CGC, CPVG)</div>
                         </div>
                     </div>
@@ -137,7 +479,7 @@
                     <!-- Right Column Image -->
                     <div class="cert-image-section">
                         <div class="cert-no-label" id="imgCaptionId">实验号: Z7281439</div>
-                        <div class="cert-result"><span>鉴定结果</span> <b style="font-size: 20px;" id="displayResult">翡翠</b>
+                        <div class="cert-result"><span data-i18n="label_result">鉴定结果</span> <b style="font-size: 20px;" id="displayResult">翡翠</b>
                         </div>
 
                         <!-- Product Image -->
@@ -146,53 +488,213 @@
                 </div>
 
                 <!-- Footer elements -->
-                <div class="file-code">文件码: GKOIS</div>
-                <div class="qr-code">QR CODE</div>
-                <div class="website-link">证书查询: www.zbldzxzf.com</div>
+                <div class="file-code"><span data-i18n="label_file_code">文件码</span>: GKOIS</div>
+                <div class="qr-code" data-i18n="label_qr">QR CODE</div>
+                <div class="website-link"><span data-i18n="label_site">证书查询</span>: www.zbldzxzf.com</div>
             </div>
         </div>
 
     </div>
 
     <script>
-        // Load data from localStorage based on URL param
-        document.addEventListener('DOMContentLoaded', () => {
+        const translations = {
+            zh: {
+                title: '珠宝检测中心网上查询',
+                nav_center: '珠宝检测中心',
+                nav_news: '新闻动态',
+                nav_about: '关于我们',
+                nav_knowledge: '珠宝知识',
+                nav_equipment: '检测仪器',
+                nav_query: '网上查询',
+                sidebar_search: '证书查询',
+                placeholder_experiment: '输入实验号',
+                btn_random: '随机查询',
+                sidebar_weather: '本地天气信息',
+                weather_city: '广州',
+                weather_condition: '多云',
+                sidebar_hours: '工作时间',
+                hours_title: '营业时间',
+                hours_weekdays: '周一至周五: 8:30-17:30',
+                hours_weekends: '周六至周日: 9:00-17:00',
+                sidebar_news: '新闻动态',
+                news_1: '检测通知公告',
+                news_2: '证书查询系统升级',
+                news_3: '样品接收提醒',
+                news_more: '更多 >>',
+                result_header: '您的查询结果如下',
+                label_mass: '总质量',
+                label_density: '密度',
+                label_refraction: '折射率',
+                label_optical: '光性特征',
+                label_spectrum: '吸收光谱',
+                label_magnification: '放大检查',
+                label_standard: '检验依据',
+                label_remarks: '备注',
+                label_inspector: '主检',
+                label_approver: '批准',
+                label_result: '鉴定结果',
+                label_file_code: '文件码',
+                label_qr: '二维码',
+                label_site: '证书查询',
+                label_experiment: '实验号'
+            },
+            en: {
+                title: 'Jewelry Certificate Inquiry',
+                nav_center: 'Jewelry Testing Center',
+                nav_news: 'News',
+                nav_about: 'About Us',
+                nav_knowledge: 'Jewelry Knowledge',
+                nav_equipment: 'Instruments',
+                nav_query: 'Online Inquiry',
+                sidebar_search: 'Certificate Search',
+                placeholder_experiment: 'Enter certificate ID',
+                btn_random: 'Random Search',
+                sidebar_weather: 'Local Weather',
+                weather_city: 'Guangzhou',
+                weather_condition: 'Cloudy',
+                sidebar_hours: 'Working Hours',
+                hours_title: 'Business Hours',
+                hours_weekdays: 'Mon–Fri: 8:30–17:30',
+                hours_weekends: 'Sat–Sun: 9:00–17:00',
+                sidebar_news: 'News',
+                news_1: 'Testing Notices',
+                news_2: 'System Upgrade',
+                news_3: 'Sample Reception',
+                news_more: 'More >>',
+                result_header: 'Your query results',
+                label_mass: 'Total Mass',
+                label_density: 'Density',
+                label_refraction: 'Refractive Index',
+                label_optical: 'Optical Character',
+                label_spectrum: 'Absorption Spectrum',
+                label_magnification: 'Magnification',
+                label_standard: 'Standard',
+                label_remarks: 'Remarks',
+                label_inspector: 'Inspector',
+                label_approver: 'Approver',
+                label_result: 'Result',
+                label_file_code: 'File Code',
+                label_qr: 'QR Code',
+                label_site: 'Certificate Check',
+                label_experiment: 'Certificate ID'
+            }
+        };
+
+        let currentLang = 'zh';
+        let currentData = null;
+
+        function t(key) {
+            return translations[currentLang]?.[key] || key;
+        }
+
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach((el) => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang]?.[key]) {
+                    el.textContent = translations[currentLang][key];
+                }
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[currentLang]?.[key]) {
+                    el.setAttribute('placeholder', translations[currentLang][key]);
+                }
+            });
+
+            document.title = t('title');
+            updateDynamicLabels();
+            updateLangButtons();
+        }
+
+        function updateLangButtons() {
+            document.querySelectorAll('.lang-btn').forEach((btn) => {
+                const isActive = btn.getAttribute('data-lang') === currentLang;
+                btn.classList.toggle('active', isActive);
+            });
+        }
+
+        function updateDynamicLabels() {
+            if (!currentData?.certId) return;
+            document.getElementById('imgCaptionId').innerText = `${t('label_experiment')}: ${currentData.certId}`;
+        }
+
+        function initLanguage() {
+            const saved = localStorage.getItem('lang');
+            if (saved === 'zh' || saved === 'en') {
+                currentLang = saved;
+            } else {
+                currentLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+            }
+            applyTranslations();
+        }
+
+        document.querySelectorAll('.lang-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                currentLang = btn.getAttribute('data-lang');
+                localStorage.setItem('lang', currentLang);
+                applyTranslations();
+            });
+        });
+
+        // Load data from Supabase based on URL param
+        document.addEventListener('DOMContentLoaded', async () => {
+            initLanguage();
             // 1. Get ID from URL
             const urlParams = new URLSearchParams(window.location.search);
             const queryId = urlParams.get('id');
 
-            // 2. Load List
-            let certList = [];
-            const savedList = localStorage.getItem('certList');
-            if (savedList) {
-                certList = JSON.parse(savedList);
-            } else {
-                // Check for old single data format for backward compatibility
-                const oldData = localStorage.getItem('certData');
-                if (oldData) certList.push(JSON.parse(oldData));
-            }
-
-            // 3. Find Item
+            // 2. Fetch from server
             let data = null;
+            
             if (queryId) {
-                // Find case-insensitive
-                data = certList.find(item => item.certId.toLowerCase() === queryId.toLowerCase());
+                try {
+                    const res = await fetch(`/certificate/${encodeURIComponent(queryId)}`);
+                    if (res.ok) {
+                        const product = await res.json();
+                        // Parse description JSON to get certificate fields
+                        const certFields = JSON.parse(product.description || '{}');
+                        data = {
+                            certId: product.name,
+                            imageUrl: product.image_url,
+                            ...certFields
+                        };
+                    }
+                } catch (err) {
+                    console.error('Failed to fetch certificate:', err);
+                }
             }
 
-            // Fallback: if no ID or not found, try to show the first one or default
-            if (!data && certList.length > 0) {
-                if (queryId) alert('Certificate not found: ' + queryId);
-                // Optional: default to first item? Or stay blank? 
-                // Let's default to first item to show *something* if list exists
-                data = certList[0];
+            // Fallback: if no ID provided, try to get first certificate
+            if (!data && !queryId) {
+                try {
+                    const res = await fetch('/certificates/names');
+                    if (res.ok) {
+                        const names = await res.json();
+                        if (names.length > 0) {
+                            // Redirect to first certificate
+                            window.location.search = '?id=' + encodeURIComponent(names[0]);
+                            return;
+                        }
+                    }
+                } catch (err) {
+                    console.error('Failed to fetch certificates:', err);
+                }
             }
 
-            // 4. Render Data
+            // Show error if not found
+            if (!data && queryId) {
+                alert('Certificate not found: ' + queryId);
+                return;
+            }
+
+            // 3. Render Data
             if (data) {
+                currentData = data;
                 if (data.certId) {
                     document.getElementById('searchIdDisplay').value = data.certId;
                     document.getElementById('mainCertId').innerText = data.certId;
-                    document.getElementById('imgCaptionId').innerText = '实验号: ' + data.certId;
+                    document.getElementById('imgCaptionId').innerText = `${t('label_experiment')}: ${data.certId}`;
                 }
 
                 if (data.mass) document.getElementById('displayMass').innerText = data.mass;
@@ -200,7 +702,7 @@
                 if (data.refraction) document.getElementById('displayRefraction').innerText = data.refraction;
                 if (data.optical) document.getElementById('displayOptical').innerText = data.optical;
                 if (data.spectrum) document.getElementById('displaySpectrum').innerText = data.spectrum;
-                if (data.magnification) document.getElementById('displayMagnification').innerHTML = data.magnification; // innerHTML in case of <br>
+                if (data.magnification) document.getElementById('displayMagnification').innerHTML = data.magnification;
                 if (data.standard) document.getElementById('displayStandard').innerText = data.standard;
                 if (data.remarks) document.getElementById('displayRemarks').innerText = data.remarks;
                 if (data.result) document.getElementById('displayResult').innerText = data.result;
@@ -214,21 +716,17 @@
                 }
 
                 // QR Code
-                // URL of *this* page
                 const currentUrl = window.location.href.split('?')[0] + '?id=' + encodeURIComponent(data.certId);
                 const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(currentUrl)}`;
 
-                // Update QR container
                 const qrContainer = document.querySelector('.qr-code');
-                qrContainer.innerHTML = ''; // clear text 'QR CODE'
+                qrContainer.innerHTML = '';
                 qrContainer.style.backgroundImage = `url('${qrUrl}')`;
                 qrContainer.style.backgroundSize = 'contain';
                 qrContainer.style.backgroundRepeat = 'no-repeat';
                 qrContainer.style.border = 'none';
             }
         });
-
-
 
         // Search Form Handler
         document.querySelector('.search-form').addEventListener('submit', (e) => {
@@ -240,20 +738,20 @@
         });
 
         // Random Button Handler
-        document.getElementById('btnRandom').addEventListener('click', () => {
-            const savedList = localStorage.getItem('certList');
-            if (savedList) {
-                const list = JSON.parse(savedList);
-                if (list.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * list.length);
-                    const randomId = list[randomIndex].certId;
-                    window.location.search = '?id=' + encodeURIComponent(randomId);
-                } else {
-                    alert('No data found!');
+        document.getElementById('btnRandom').addEventListener('click', async () => {
+            try {
+                const res = await fetch('/certificates/names');
+                if (res.ok) {
+                    const names = await res.json();
+                    if (names.length > 0) {
+                        const randomIndex = Math.floor(Math.random() * names.length);
+                        window.location.search = '?id=' + encodeURIComponent(names[randomIndex]);
+                    } else {
+                        alert('No certificates found!');
+                    }
                 }
-            } else {
-                // Fallback if no list
-                window.location.search = '?id=Z7281439';
+            } catch (err) {
+                alert('Failed to load certificates');
             }
         });
     </script>
